@@ -1,0 +1,9 @@
+[submodule "api_gateway"]
+	path = api_gateway
+	url = git@github.com:asbel70600/tecopos_api_gateway
+[submodule "services/banking"]
+	path = services/banking
+	url = git@github.com:asbel70600/tecopos_banking_service
+[submodule "services/sso"]
+	path = services/sso
+	url = git@github.com:asbel70600/tecopos_sso_service

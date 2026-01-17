@@ -1,0 +1,77 @@
+services:
+  sso-db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - sso-db-data:${DB_DATA_DIR}
+    networks:
+      - tecopos-network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - tecopos-network
+
+  sso-service:
+    build:
+      context: ./services/sso
+      dockerfile: Dockerfile
+    ports:
+      - "${SSO_PORT}:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sso-db:5432/${POSTGRES_DB}
+      PORT: 3000
+    depends_on:
+      - sso-db
+    networks:
+      - tecopos-network
+    volumes:
+      - ./services/sso/keys:/app/keys:ro
+
+  banking-service:
+    build:
+      context: ./services/banking
+      dockerfile: Dockerfile
+    ports:
+      - "${BANKING_PORT}:3000"
+    environment:
+      PORT: 3000
+      SSO_SERVICE_URL: http://sso-service:3000
+      MOCKAPI_URL: ${MOCKAPI_URL}
+    depends_on:
+      - sso-service
+    networks:
+      - tecopos-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "${GATEWAY_PORT}:3000"
+    environment:
+      PORT: 3000
+      SSO_SERVICE_URL: http://sso-service:3000
+      BANKING_SERVICE_URL: http://banking-service:3000
+    depends_on:
+      - sso-service
+      - banking-service
+    networks:
+      - tecopos-network
+
+networks:
+  tecopos-network:
+    driver: bridge
+
+volumes:
+  sso-db-data:
