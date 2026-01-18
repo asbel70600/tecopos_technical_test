@@ -10,14 +10,14 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - sso-db-data:${DB_DATA_DIR}
+      - sso-db-data:/var/lib/postgresql/data
     networks:
       - tecopos-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
 
   adminer:
     image: adminer
@@ -64,7 +64,6 @@ services:
     build:
       context: ./api_gateway
       dockerfile: Dockerfile
-    restart: always
     ports:
       - "${GATEWAY_PORT}:3000"
     environment:
