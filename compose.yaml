@@ -29,6 +29,7 @@ services:
     ports:
       - "${SSO_PORT}:3000"
     environment:
+      GRPC_URL: 0.0.0.0:50051
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sso-db:5432/${POSTGRES_DB}
       PORT: 3000
     depends_on:
@@ -55,7 +56,7 @@ services:
 
   api-gateway:
     build:
-      context: ./api-gateway
+      context: ./api_gateway
       dockerfile: Dockerfile
     ports:
       - "${GATEWAY_PORT}:3000"
