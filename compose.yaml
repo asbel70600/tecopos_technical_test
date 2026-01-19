@@ -1,23 +1,23 @@
 services:
-  sso-db:
-    image: postgres
-    restart: always
-    shm_size: 128mb
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "${DB_PORT}:5432"
-    volumes:
-      - sso-db-data:${DB_DATA_DIR}
-    networks:
-      - tecopos-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+  # sso-db:
+  #   image: postgres
+  #   restart: always
+  #   shm_size: 128mb
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   ports:
+  #     - "${DB_PORT}:5432"
+  #   volumes:
+  #     - sso-db-data:${DB_DATA_DIR}
+  #   networks:
+  #     - tecopos-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_DB}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
 
   adminer:
     image: adminer
@@ -27,22 +27,22 @@ services:
     networks:
       - tecopos-network
 
-  sso-service:
-    build:
-      context: ./services/sso
-      dockerfile: Dockerfile
-    ports:
-      - "${SSO_PORT}:50051"
-    environment:
-      GRPC_URL: 0.0.0.0:50051
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sso-db:5432/${POSTGRES_DB}
-    depends_on:
-      sso-db:
-        condition: service_healthy
-    networks:
-      - tecopos-network
-    volumes:
-      - ./services/sso/keys:/app/keys:ro
+  # sso-service:
+  #   build:
+  #     context: ./services/sso
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${SSO_PORT}:50051"
+  #   environment:
+  #     GRPC_URL: 0.0.0.0:50051
+  #     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sso-db:5432/${POSTGRES_DB}
+  #   depends_on:
+  #     sso-db:
+  #       condition: service_healthy
+  #   networks:
+  #     - tecopos-network
+  #   volumes:
+  #     - ./services/sso/keys:/app/keys:ro
 
   banking-service:
     build:
@@ -55,8 +55,8 @@ services:
       PORT: 3000
       GRPC_URL: 0.0.0.0:50052
       MOCKAPI_URL: ${MOCKAPI_URL}
-    depends_on:
-      - sso-service
+    # depends_on:
+    # - sso-service
     networks:
       - tecopos-network
 
@@ -72,7 +72,7 @@ services:
       SSO_SERVICE_URL: sso-service:50051
       BANKING_SERVICE_URL: banking-service:50052
     depends_on:
-      - sso-service
+      # - sso-service
       - banking-service
     networks:
       - tecopos-network
