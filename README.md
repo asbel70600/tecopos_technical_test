@@ -11,3 +11,10 @@ so to get the sources you need to do:
 
 # How to deploy:
 `docker compose up --build`
+
+# Current Status:
+The api-gateway offers a fiew routes but the only one working
+is: http://127.0.0.1:3000/banking/accounts. It returns every account on mockapi.
+
+The rest are developed but can't be used because of the sso service being
+unable to run
